@@ -61,6 +61,42 @@ You can easily switch `BASE_URL` to another API for test reuse without changing 
 
 ---
 
+## 🚀 Quick Start
+
+Follow these steps to set up and run the project locally:
+
+### 1️⃣ Clone the repository
+```bash
+git clone https://github.com/refnando/restassured-poc.git
+cd restassured-poc
+```
+
+### 2️⃣ Verify Java and Maven installation
+```bash
+java -version
+mvn -v
+```
+Make sure you have **Java 17** and **Maven 3.9+** installed.
+
+### 3️⃣ Install dependencies
+```bash
+mvn clean install
+```
+
+### 4️⃣ Run the tests
+```bash
+mvn test
+```
+
+### 5️⃣ (Optional) Generate Allure Report
+```bash
+allure serve allure-results
+```
+
+> 💡 Tip: You can switch the `BASE_URL` in your `.env` file to target a different API without modifying the code.
+
+---
+
 ## 🧪 Example Test — `SimpsonsTest.java`
 
 ```java
@@ -74,7 +110,7 @@ void validateCharacterList() {
     .then()
         .assertThat()
         .statusCode(HttpStatus.OK)
-        .body("info.count", greaterThan(0))
+        .body("info.count", greaterThan(Numbers.ZERO))
         .body("results.size()", equalTo(Numbers.RESULT_LIMIT));
 }
 ```
@@ -153,7 +189,7 @@ allure serve allure-results
 📍 Guadalajara, México  
 🔗 [GitHub Profile](https://github.com/refnando)
 
-> Specialized in API and UI test automation using Java (RestAssured, Selenium) and TypeScript (Playwright), with strong experience in building modular frameworks and integrating tests into CI/CD pipelines.
+> Specialized in API and UI test automation using Java (RestAssured, Selenium) and TypeScript (Pactum, Playwright), with strong experience in building modular frameworks and integrating tests into CI/CD pipelines.
 
 ---
 
