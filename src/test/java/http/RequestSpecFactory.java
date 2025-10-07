@@ -6,6 +6,7 @@ import io.restassured.config.HttpClientConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.filter.log.ErrorLoggingFilter;
 import io.restassured.specification.RequestSpecification;
+import utils.CorrelationFilter;
 
 import static  io.restassured.http.ContentType.JSON;
 
@@ -19,6 +20,7 @@ public class RequestSpecFactory {
         return new RequestSpecBuilder()
                 .setBaseUri(Environment.BASE_URL)
                 .setContentType(JSON)
+                .addFilter(new CorrelationFilter())
                 .addFilter(new ErrorLoggingFilter())
                 .setConfig(config)
                 .build();
