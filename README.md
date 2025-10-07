@@ -1,96 +1,81 @@
-# 🧪 RestAssured Demo Framework — The Simpsons API
+# RestAssured Demo Framework — The Simpsons API
+
+![Java](https://img.shields.io/badge/Java-17-blue)
+![JUnit5](https://img.shields.io/badge/JUnit-5-green)
+![RestAssured](https://img.shields.io/badge/RestAssured-API--Testing-orange)
+![Maven](https://img.shields.io/badge/Build-Maven-lightgrey)
+![License](https://img.shields.io/badge/License-MIT-blue)
+
+---
 
 This project demonstrates a **Java + RestAssured** testing framework that validates REST API endpoints using **JUnit 5** and **Maven**.  
-It is built around the [The Simpsons API](https://thesimpsonsapi.com/api/characters), which provides paginated character data.
+It is built around **[The Simpsons API](https://thesimpsonsquoteapi.glitch.me/)**, which provides paginated character data.
 
 ---
 
 ## 🚀 Features
 
-- ✅ Modular architecture using `BaseTest` and reusable request specs  
-- ✅ Environment configuration with `.env` files  
-- ✅ Constants for HTTP codes, endpoints, and reusable numeric values  
-- ✅ Response validator utility for clean and readable assertions  
-- ✅ Pagination and single-resource validation  
-- ✅ JSON schema-ready structure for contract validation  
-- ✅ Optional Allure reporting integration  
+- Modular orchestration with `BaseTest` and reusable request specs  
+- Environment configuration with `.env` files  
+- Reusable HTTP constants, helpers, and numerical values  
+- JSON Schema validation for responses  
+- Parametrized data-driven tests  
+- Dynamic environment loader for endpoint switching  
+- Optional **Allure** reporting integration  
 
 ---
 
-## 📂 Project Structure
+## 🧱 Project Structure
 
 ```bash
-📁 restassured-poc
-├── 📄 pom.xml
-├── 📄 .gitignore
-├── 📄 .env
-│
-├── 📁 src
-│   └── 📁 test
-│       ├── 📁 java
-│       │   ├── 📁 base
-│       │   │   └── BaseTest.java
-│       │   ├── 📁 config
-│       │   │   └── Environment.java
-│       │   ├── 📁 constants
-│       │   │   ├── ApiConstants.java
-│       │   │   ├── HttpStatus.java
-│       │   │   └── Numbers.java
-│       │   ├── 📁 http
-│       │   │   └── RequestSpecFactory.java
-│       │   ├── 📁 models
-│       │   ├── 📁 tests
-│       │   │   └── SimpsonsTest.java
-│       │   └── 📁 utils
-│       │       ├── CorrelationFilter.java
-│       │       └── ResponseValidator.java
-│       │
-│       └── 📁 resources
-│           ├── 📁 data
-│           ├── 📁 schemas
-│           └── 📄 .env
-│
-├── 📁 allure-results
-│   └── (auto-generated Allure report data)
-│
-└── 📁 .mvn
-    └── (Maven wrapper configuration)
+restassured-poc
+├── .idea/
+├── src
+│   └── test
+│       ├── java
+│       │   ├── base
+│       │   ├── config
+│       │   ├── constants
+│       │   ├── http
+│       │   ├── tests
+│       │   └── utils
+│       └── resources
+├── pom.xml
+├── .gitignore
+└── README.md
 ```
 
 ---
 
 ## ⚙️ Environment Configuration
 
-All environment variables are defined in `.env` and dynamically loaded by `Environment.java`.
+All environment variables are defined in a `.env` file and dynamically loaded by `Environment.java`.
 
-```properties
-BASE_URL=https://thesimpsonsapi.com/api
-TIMEOUT_MS=5000
+Example:
+```env
+BASE_URL=https://thesimpsonsquoteapi.glitch.me
+TIMEOUT=5000
 ```
 
-> 💡 Tip: You can switch the `BASE_URL` to another API for fast reuse without changing code.
+You can easily switch `BASE_URL` to another API for test reuse without changing code.
 
 ---
 
-## 🧩 Example Test — `SimpsonsTest.java`
+## 🧪 Example Test — `SimpsonsTest.java`
 
 ```java
 @Test
 @DisplayName("GET /characters returns metadata and 20 results")
-void getCharacters_ok() {
-    Response response = given()
-            .spec(RequestSpecFactory.getDefaultSpec())
+void validateCharacterList() {
+    given()
+        .spec(RequestSpecFactory.getRequestSpec())
     .when()
-            .get(ApiConstants.CHARACTERS)
+        .get(CHARACTERS)
     .then()
-            .extract().response();
-
-    ResponseValidator.status(response, HttpStatus.OK);
-
-    response.then()
-            .body("count", greaterThan(Numbers.ZERO))
-            .body("results.size()", equalTo(20))
-            .body("results[0].name", not(emptyOrNullString()));
+        .assertThat()
+        .statusCode(HttpStatus.OK)
+        .body("info.count", greaterThan(0))
+        .body("results.size()", equalTo(Numbers.RESULT_LIMIT));
 }
 ```
 
@@ -99,10 +84,10 @@ void getCharacters_ok() {
 ## 🧰 Build & Run
 
 ### 1️⃣ Install Dependencies
-Make sure you have **Java ≥ 17** and **Maven ≥ 3.9** installed:
+Make sure you have **Java 17** and **Maven 3.9+** installed.
+
 ```bash
-java -version
-mvn -version
+mvn clean install
 ```
 
 ### 2️⃣ Run Tests
@@ -112,57 +97,46 @@ mvn clean test
 
 ### 3️⃣ (Optional) Generate Allure Report
 ```bash
-mvn allure:serve
+allure serve allure-results
 ```
+
+> Developed and tested on macOS using IntelliJ IDEA 2025.1
 
 ---
 
-## 🧠 API Reference
+## 📡 API Reference
 
 | Endpoint | Description | Example |
 |-----------|--------------|----------|
-| `/characters` | List of characters (20 per page) | [GET /api/characters](https://thesimpsonsapi.com/api/characters) |
-| `/characters?page=2` | Fetch second page | [GET /api/characters?page=2](https://thesimpsonsapi.com/api/characters?page=2) |
-| `/characters/{id}` | Single character details | [GET /api/characters/1](https://thesimpsonsapi.com/api/characters/1) |
-| `/quotes` | Random character quotes | [GET /api/quotes](https://thesimpsonsapi.com/api/quotes) |
+| `/characters` | List of characters (paginated) | `GET /api/characters` |
+| `/character/:id` | Fetch single character | `GET /api/character/5` |
+| `/quotes` | Random character quotes | `GET /api/quotes` |
 
 ---
 
-## 🧾 Example Response Schema
+## 📦 Example Response Schema
+
+<details>
+<summary>Click to view sample JSON</summary>
 
 ```json
 {
-  "count": 1182,
-  "next": "https://thesimpsonsapi.com/api/characters?page=2",
-  "prev": null,
-  "pages": 60,
-  "results": [
-    {
-      "id": 1,
-      "age": 39,
-      "birthdate": "1956-05-12",
-      "gender": "Male",
-      "name": "Homer Simpson",
-      "occupation": "Safety Inspector",
-      "portrait_path": "/character/1.webp",
-      "phrases": [
-        "Doh!",
-        "Woo-hoo!",
-        "Stupid Flanders!"
-      ],
-      "status": "Alive"
-    }
-  ]
+  "id": 1,
+  "name": "Homer Simpson",
+  "gender": "Male",
+  "image": "https://example.com/homer.png",
+  "quote": "D'oh!"
 }
 ```
+</details>
 
 ---
 
-## 🧱 Technologies Used
+## 🧠 Technologies Used
 
 | Category | Tool |
 |-----------|------|
-| Language | Java 21 |
+| Language | Java 17 |
 | Test Framework | JUnit 5 |
 | HTTP Client | RestAssured |
 | Build Tool | Maven |
@@ -172,25 +146,29 @@ mvn allure:serve
 
 ---
 
-## 🧑‍💻 Author
+## 👨‍💻 Author
 
 **Fernando Campos**  
-QA Automation Engineer / SDET  
-📍 Guadalajara, Jalisco  
-💼 Focused on API testing, automation frameworks, and CI/CD integration.
+*QA Automation Engineer / SDET*  
+📍 Guadalajara, México  
+🔗 [GitHub Profile](https://github.com/refnando)
+
+> Specialized in API and UI test automation using Java (RestAssured, Selenium) and TypeScript (Playwright), with strong experience in building modular frameworks and integrating tests into CI/CD pipelines.
 
 ---
 
-## 🏁 Future Enhancements
+## 🔮 Future Improvements
 
-- [ ] JSON Schema validation for `/characters`  
-- [ ] Extend to `/episodes` and `/quotes` endpoints  
-- [ ] Add GitHub Actions CI pipeline  
-
+- Add negative test cases and error handling  
+- Extend schema validation for `/character/:id`  
+- Implement GitHub Actions CI/CD pipeline  
+- Add data-driven tests for pagination  
 
 ---
 
-## 📄 License
+## 🪪 License
 
-This project is open-sourced for educational and demo purposes.  
-You are free to clone, modify, and extend it for non-commercial use.
+This project is open-source and intended for educational and demo purposes.  
+You are free to **clone**, **modify**, and **use** it for non-commercial or learning projects.
+
+---
