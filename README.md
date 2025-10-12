@@ -29,7 +29,6 @@ It is built around **[The Simpsons API](https://thesimpsonsquoteapi.glitch.me/)*
 
 ```bash
 restassured-poc
-├── .idea/
 ├── src
 │   └── test
 │       ├── java
@@ -67,7 +66,7 @@ Follow these steps to set up and run the project locally:
 
 ### 1️⃣ Clone the repository
 ```bash
-git clone https://github.com/refnando/restassured-poc.git
+git clone https://github.com/<your_user_name>/restassured-poc.git
 cd restassured-poc
 ```
 
